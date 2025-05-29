@@ -27,3 +27,4 @@ media/
 # Misc
 *.swp
 .DS_Store
+/DjangoProject/App/__pycache__

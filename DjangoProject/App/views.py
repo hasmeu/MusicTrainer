@@ -8,8 +8,9 @@ from App.forms import CustomUserCreationForm
 
 # Create your views here.
 
+
 def index(request):
-    return HttpResponse("Hello, world.")
+    return render(request, 'App/index.html')
 
 def home(request):
     return render(request, "App/Home.html")
