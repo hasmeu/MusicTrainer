@@ -2,14 +2,20 @@
   "name": "frontend",
   "version": "1.0.0",
   "dependencies": {
+    "@tonejs/midi": "^2.0.28",
+    "lucide-react": "^0.511.0",
+    "midi-player-js": "^2.0.16",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@babel/core": "^7.27.3",
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-react": "^7.27.1",
     "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
   },

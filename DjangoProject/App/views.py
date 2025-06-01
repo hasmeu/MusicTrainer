@@ -12,9 +12,6 @@ from App.forms import CustomUserCreationForm
 def index(request):
     return render(request, 'App/index.html')
 
-def home(request):
-    return render(request, "App/Home.html")
-
 
 def login_view(request):
     if request.method == "POST":
@@ -23,7 +20,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect(home)
+            return redirect(index)
         else:
             messages.error(request, "Invalid username or password")
     return render(request, "App/Login.html")
@@ -34,7 +31,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect(home)
+            return redirect(index)
     else:
         form = CustomUserCreationForm()
     return render(request, "App/Sign_Up.html", {"form": form})
