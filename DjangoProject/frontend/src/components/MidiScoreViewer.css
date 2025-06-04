@@ -1,0 +1,81 @@
+.midi-score-viewer {
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.controls {
+    margin-bottom: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.time-signature-select {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.play-button {
+    padding: 12px 24px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.play-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.score-display {
+    width: 100%;
+    min-height: 70vh;
+    overflow-x: auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.score-display svg {
+    transition: transform 0.3s ease;
+}
+
+/* Make sure the parent containers don't restrict the size */
+.content-container {
+    max-width: 100%;
+    padding: 0 20px;
+}
+
+.main-content {
+    width: 100%;
+    max-width: none;
+    padding: 20px 0;
+}
+
+/* Hide any remaining metadata text */
+.abcjs-title,
+.abcjs-subtitle,
+.abcjs-composer,
+.abcjs-author,
+.abcjs-tempo,
+.abcjs-rhythm {
+    display: none !important;
+}

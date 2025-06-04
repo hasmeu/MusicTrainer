@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Home.css';
+import MidiScoreViewer from './MidiScoreViewer';
+
 function Home() {
+    const [selectedFile, setSelectedFile] = useState(null);
+    const demoMidiUrl = '/Counterpoint%20Composition%20.mid'; // URL-encoded space
+
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+        }
+    };
+
     return (
         <div className="home-container">
             {/* Navigation Bar */}
@@ -18,6 +30,14 @@ function Home() {
                 <div className="content-container">
                     <h1>Welcome to MusicTrainer</h1>
                     <p>Start your musical journey today!</p>
+                    <div className="midi-upload">
+                        <input
+                            type="file"
+                            accept=".mid,.midi"
+                            onChange={handleFileUpload}
+                        />
+                    </div>
+                    <MidiScoreViewer midiFile={selectedFile || demoMidiUrl} />
                 </div>
             </main>
             {/* Button Row */}
@@ -29,4 +49,5 @@ function Home() {
         </div>
     );
 }
+
 export default Home;

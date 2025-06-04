@@ -61,3 +61,16 @@
 .action-button:hover {
     background-color: #2980b9;
 }
+
+.midi-upload {
+    margin: 20px 0;
+    padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.midi-upload input[type="file"] {
+    display: inline-block;
+    padding: 10px;
+}
