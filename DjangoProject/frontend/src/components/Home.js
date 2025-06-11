@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import './Home.css';
-import MidiScoreViewer from './MidiScoreViewer';
+import ScoreViewer from './MidiScoreViewer';
+import { Wand2 } from 'lucide-react';
 
 function Home() {
-    const [selectedFile, setSelectedFile] = useState(null);
-    const demoMidiUrl = '/Counterpoint%20Composition%20.mid'; // URL-encoded space
+    const [abcNotation, setAbcNotation] = useState("C2 C2 | G2 G2 | A2 A2 | G4 |");
+    const [isGenerating, setIsGenerating] = useState(false);
 
-    const handleFileUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setSelectedFile(file);
+    const handleGenerate = async () => {
+        setIsGenerating(true);
+        try {
+            // TODO: Add AI generation logic here
+            // For now, just simulate a delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Placeholder: Later this will be replaced with actual AI-generated ABC notation
+            setAbcNotation("E2 E2 | F2 F2 | G2 G2 | C4 |");
+        } catch (error) {
+            console.error('Error generating etude:', error);
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -17,35 +26,57 @@ function Home() {
         <div className="home-container">
             {/* Navigation Bar */}
             <nav className="navbar">
-                <div className="nav-brand">MusicTrainer</div>
+                <div className="nav-brand">
+                    <span className="logo-icon">🎵</span>
+                    MusicTrainer
+                </div>
                 <div className="nav-links">
-                    <a href="#home">Home</a>
-                    <a href="#practice">Practice</a>
-                    <a href="#stats">Options</a>
-                    <a href="#profile">Profile</a>
+                    <a href="#home" className="nav-link active">Home</a>
+                    <a href="#practice" className="nav-link">Practice</a>
+                    <a href="#stats" className="nav-link">Statistics</a>
+                    <a href="#profile" className="nav-link">Profile</a>
                 </div>
             </nav>
-            {/* Centered Display Area */}
-            <main className="main-content">
-                <div className="content-container">
-                    <h1>Welcome to MusicTrainer</h1>
-                    <p>Start your musical journey today!</p>
-                    <div className="midi-upload">
-                        <input
-                            type="file"
-                            accept=".mid,.midi"
-                            onChange={handleFileUpload}
-                        />
-                    </div>
-                    <MidiScoreViewer midiFile={selectedFile || demoMidiUrl} />
+
+            {/* Hero Section */}
+            <section className="hero-section">
+                <div className="hero-content">
+                    <h1 className="hero-title">Welcome to MusicTrainer</h1>
                 </div>
-            </main>
-            {/* Button Row */}
-            <div className="button-row">
-                <button className="action-button">Start Practice</button>
-                <button className="action-button">View Progress</button>
-                <button className="action-button">Settings</button>
-            </div>
+            </section>
+
+            {/* Score Viewer Section */}
+            <section className="score-section">
+                <div className="section-header">
+                    <h2>Your Music Score</h2>
+                    <div className="score-actions">
+                        <p>Generate new etudes</p>
+                        <button
+                            className={`generate-button ${isGenerating ? 'generating' : ''}`}
+                            onClick={handleGenerate}
+                            disabled={isGenerating}
+                        >
+                            <Wand2 className="generate-icon" size={20} />
+                            {isGenerating ? 'Generating...' : 'Generate Etude'}
+                        </button>
+                    </div>
+                </div>
+                <div className="score-container">
+                    <ScoreViewer abcNotation={abcNotation} />
+                </div>
+            </section>
+
+            {/* Action Buttons */}
+            <section className="action-section">
+                <div className="button-grid">
+
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="footer">
+                <p>&copy; 2025 MusicTrainer. Start your musical journey today!</p>
+            </footer>
         </div>
     );
 }

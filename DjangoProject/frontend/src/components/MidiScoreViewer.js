@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Midi } from '@tonejs/midi';
-import * as Tone from 'tone';
+import React, { useState, useRef, useEffect } from 'react';
 import ABCJS from 'abcjs';
+import { Settings, Play, Pause, Square } from 'lucide-react';
 import './MidiScoreViewer.css';
+
 
 const TIME_SIGNATURES = [
     { numerator: 4, denominator: 4, display: "4/4" },
@@ -13,236 +13,248 @@ const TIME_SIGNATURES = [
     { numerator: 12, denominator: 8, display: "12/8" }
 ];
 
-const MidiScoreViewer = ({ midiFile }) => {
-    const [midiData, setMidiData] = useState(null);
+const KEY_SIGNATURES = [
+    { key: 'C', display: 'C Major' },
+    { key: 'G', display: 'G Major' },
+    { key: 'D', display: 'D Major' },
+    { key: 'A', display: 'A Major' },
+    { key: 'E', display: 'E Major' },
+    { key: 'F', display: 'F Major' },
+    { key: 'Bb', display: 'Bb Major' },
+    { key: 'Eb', display: 'Eb Major' },
+    { key: 'Am', display: 'A Minor' },
+    { key: 'Em', display: 'E Minor' },
+    { key: 'Bm', display: 'B Minor' },
+    { key: 'Dm', display: 'D Minor' },
+    { key: 'Gm', display: 'G Minor' }
+];
+
+const ScoreViewer = ({ abcNotation = '' }) => {
+    const [timeSignature, setTimeSignature] = useState({ numerator: 4, denominator: 4 });
+    const [selectedKey, setSelectedKey] = useState('C');
+    const [tempo, setTempo] = useState(120);
+    const [title, setTitle] = useState('New Score');
+    const [showSettings, setShowSettings] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [selectedTimeSignature, setSelectedTimeSignature] = useState({ numerator: 4, denominator: 4 });
     const scoreRef = useRef(null);
-    const synth = useRef(null);
+    const synthRef = useRef(null);
+    const visualizerRef = useRef(null);
 
     useEffect(() => {
-        if (midiFile) {
-            loadMidiFile(midiFile);
-        }
-    }, [midiFile]);
+        updateScore();
+        // Clean up synth on unmount
+        return () => {
+            if (synthRef.current) {
+                synthRef.current.stop();
+            }
+        };
+    }, [abcNotation, timeSignature, selectedKey, tempo, title]);
 
-    // Re-render score when time signature changes
-    useEffect(() => {
-        if (midiData) {
-            const abcString = midiToABC(midiData);
-            renderScore(abcString);
-        }
-    }, [selectedTimeSignature]);
+    const updateScore = () => {
+        if (!scoreRef.current) return;
 
-    const handleTimeSignatureChange = (event) => {
-        const [numerator, denominator] = event.target.value.split('/').map(Number);
-        setSelectedTimeSignature({ numerator, denominator });
-    };
-
-    const midiToABC = (midi) => {
-        // Use selected time signature instead of MIDI file's time signature
-        const timeSignature = selectedTimeSignature;
-
-        // Get tempo from MIDI file
-        const tempo = midi.header.tempos.length > 0
-            ? Math.round(midi.header.tempos[0].bpm)
-            : 120;
-
-        let abcString = `%%titlefont none
-X:1
-T:
+        const headerString = `X:1
+T:${title}
 M:${timeSignature.numerator}/${timeSignature.denominator}
 L:1/8
 Q:1/4=${tempo}
-%%staves P1
-V:P1 clef=treble
-K:C
+K:${selectedKey}
 `;
 
-        const track = midi.tracks.find(track => track.notes.length > 0);
-        if (!track) return abcString;
+        const fullNotation = headerString + (abcNotation || 'z4 |]');
 
-        const notes = [...track.notes].sort((a, b) => a.time - b.time);
-        let currentBeat = 0;
-        const beatsPerMeasure = timeSignature.numerator * (8 / timeSignature.denominator);
-
-        // Group notes by their start time to handle chords
-        const noteGroups = {};
-        notes.forEach(note => {
-            const startTime = Math.round(note.time * 100) / 100;
-            if (!noteGroups[startTime]) {
-                noteGroups[startTime] = [];
-            }
-            noteGroups[startTime].push(note);
-        });
-
-        // Process notes in order
-        Object.keys(noteGroups)
-            .sort((a, b) => parseFloat(a) - parseFloat(b))
-            .forEach(time => {
-                const groupNotes = noteGroups[time];
-
-                if (groupNotes.length > 1) {
-                    abcString += '[';
-                    groupNotes.forEach((note, index) => {
-                        const midiNote = note.midi;
-                        const octave = Math.floor(midiNote / 12) - 5;
-                        let noteName = note.name.replace(/\d+$/, '');
-                        noteName = noteName.replace('#', '^').replace('b', '_');
-
-                        if (octave >= 0) {
-                            noteName = noteName.toLowerCase();
-                        }
-
-                        const octaveModifier = octave > 0 ? "'".repeat(octave) :
-                            octave < 0 ? ",".repeat(-octave) : '';
-
-                        abcString += `${noteName}${octaveModifier}`;
-                        if (index === groupNotes.length - 1) {
-                            const duration = Math.round(note.duration * 8);
-                            abcString += `${duration || 1}]`;
-                            currentBeat += duration;
-                        }
-                    });
-                } else {
-                    const note = groupNotes[0];
-                    const midiNote = note.midi;
-                    const octave = Math.floor(midiNote / 12) - 5;
-                    let noteName = note.name.replace(/\d+$/, '');
-                    noteName = noteName.replace('#', '^').replace('b', '_');
-
-                    if (octave >= 0) {
-                        noteName = noteName.toLowerCase();
-                    }
-
-                    const octaveModifier = octave > 0 ? "'".repeat(octave) :
-                        octave < 0 ? ",".repeat(-octave) : '';
-
-                    const duration = Math.round(note.duration * 8);
-                    abcString += `${noteName}${octaveModifier}${duration || 1}`;
-                    currentBeat += duration;
-                }
-
-                if (currentBeat >= beatsPerMeasure) {
-                    abcString += " | ";
-                    currentBeat = currentBeat % beatsPerMeasure;
-                } else {
-                    abcString += " ";
-                }
-            });
-
-        if (!abcString.endsWith(" | ")) {
-            abcString += " |]";
-        }
-
-        return abcString;
-    };
-
-    const renderScore = (abcString) => {
-        ABCJS.renderAbc(scoreRef.current, abcString, {
+        // Create the visual score
+        const visualObj = ABCJS.renderAbc(scoreRef.current, fullNotation, {
             responsive: 'resize',
             add_classes: true,
-            staffwidth: 1600,
-            scale: 2,
-            paddingbottom: 50,
-            paddingright: 50,
-            paddingleft: 50,
-            paddingtop: 50,
+            staffwidth: 2000,  // Increased from 1600
+            scale: 2.0,        // Increased from 1.5
+            paddingbottom: 40, // Increased padding for better visual balance
+            paddingright: 40,
+            paddingleft: 40,
+            paddingtop: 40,
             format: {
-                gchordfont: "Arial",
                 measurenumber: true,
-                vocalfont: "Arial",
-                composerfont: "Arial",
-                composerspace: 0,
-                partsfont: "Arial",
-                tempofont: "Arial",
-                titlefont: "Arial",
-                annotationfont: "Arial",
-                footerfont: "Arial",
-                headerfont: "Arial",
-                historyfont: "Arial",
-                infofont: "Arial",
-                textfont: "Arial",
-                wordsfont: "Arial"
+                vocalfont: "Arial 12",
+                composerfont: "Arial 14",
+                titlefont: "Arial 16",
+                tempofont: "Arial 12",
+                annotationfont: "Arial 10",
+                footerfont: "Arial 10",
+                headerfont: "Arial 10",
+                textfont: "Arial 12",
+                wordsfont: "Arial 12"
             }
         });
-    };
 
-    const loadMidiFile = async (file) => {
-        try {
-            let midi;
-            if (file instanceof File) {
-                const arrayBuffer = await file.arrayBuffer();
-                midi = new Midi(arrayBuffer);
-            } else if (typeof file === 'string') {
-                midi = await Midi.fromUrl(file);
-            } else {
-                throw new Error('Invalid file type. Expected File object or URL string');
-            }
-
-            setMidiData(midi);
-            const abcString = midiToABC(midi);
-            renderScore(abcString);
-        } catch (error) {
-            console.error('Error loading MIDI file:', error);
-        }
-    };
-
-    const playMidi = async () => {
-        if (!midiData || isPlaying) return;
-
-        setIsPlaying(true);
-        if (!synth.current) {
-            synth.current = new Tone.PolySynth().toDestination();
+        // Initialize synthesizer if it hasn't been yet
+        if (!synthRef.current) {
+            synthRef.current = new ABCJS.synth.CreateSynth();
         }
 
-        midiData.tracks.forEach(track => {
-            track.notes.forEach(note => {
-                synth.current.triggerAttackRelease(
-                    note.name,
-                    note.duration,
-                    note.time + Tone.now(),
-                    note.velocity
-                );
+        // Initialize audio context and prepare the tune
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const visualObj0 = visualObj[0];
+
+        if (visualObj0) {
+            synthRef.current.init({
+                audioContext: audioContext,
+                visualObj: visualObj0,
+                millisecondsPerMeasure: (60000 / tempo) * timeSignature.numerator
+            }).then(() => {
+                console.log("Audio ready");
+            }).catch(error => {
+                console.error("Audio initialization failed:", error);
             });
-        });
-
-        setTimeout(() => {
-            setIsPlaying(false);
-        }, midiData.duration * 1000);
+        }
     };
 
+    const handlePlayback = async () => {
+        if (!synthRef.current) return;
+
+        if (isPlaying) {
+            synthRef.current.stop();
+            setIsPlaying(false);
+        } else {
+            try {
+                await synthRef.current.start();
+                setIsPlaying(true);
+                synthRef.current.addEventListener('ended', () => {
+                    setIsPlaying(false);
+                });
+            } catch (error) {
+                console.error("Playback failed:", error);
+                setIsPlaying(false);
+            }
+        }
+    };
+
+    const handleStop = () => {
+        if (synthRef.current) {
+            synthRef.current.stop();
+            setIsPlaying(false);
+        }
+    };
+
+    // ... (keep existing handleTimeSignatureChange and downloadAbc functions)
+    const handleTimeSignatureChange = (sig) => {
+        setTimeSignature({
+            numerator: sig.numerator,
+            denominator: sig.denominator
+        });
+    };
+    const downloadAbc = () => {
+        const headerString = `X:1
+T:${title}
+M:${timeSignature.numerator}/${timeSignature.denominator}
+L:1/8
+Q:1/4=${tempo}
+K:${selectedKey}
+`;
+        const fullNotation = headerString + (abcNotation || 'z4 |]');
+
+        const blob = new Blob([fullNotation], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title.replace(/\s+/g, '_')}.abc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    };
     return (
-        <div className="midi-score-viewer">
-            <div className="controls">
-                <div className="control-group">
-                    <label htmlFor="timeSignature">Time Signature: </label>
-                    <select
-                        id="timeSignature"
-                        value={`${selectedTimeSignature.numerator}/${selectedTimeSignature.denominator}`}
-                        onChange={handleTimeSignatureChange}
-                        className="time-signature-select"
+        <div className="score-viewer">
+            <div className="header">
+                <h1 className="title">ABC Score Editor</h1>
+                <div className="controls">
+                    <button
+                        className="playback-button"
+                        onClick={handlePlayback}
+                        title={isPlaying ? "Pause" : "Play"}
                     >
-                        {TIME_SIGNATURES.map(ts => (
-                            <option key={ts.display} value={ts.display}>
-                                {ts.display}
-                            </option>
-                        ))}
-                    </select>
+                        {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+                    </button>
+                    <button
+                        className="stop-button"
+                        onClick={handleStop}
+                        title="Stop"
+                    >
+                        <Square size={24} />
+                    </button>
+                    <button
+                        className="settings-button"
+                        onClick={() => setShowSettings(!showSettings)}
+                    >
+                        <Settings size={24} />
+                    </button>
                 </div>
-                <button
-                    onClick={playMidi}
-                    disabled={!midiData || isPlaying}
-                    className="play-button"
-                >
-                    {isPlaying ? 'Playing...' : 'Play'}
-                </button>
             </div>
-            <div className="score-display">
-                <div ref={scoreRef} />
-            </div>
+
+            {showSettings && (
+                <div className="settings-panel">
+                    <div className="setting-group">
+                        <label>Title:</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="title-input"
+                        />
+                    </div>
+                    <div className="setting-group">
+                        <label>Tempo:</label>
+                        <input
+                            type="number"
+                            value={tempo}
+                            onChange={(e) => setTempo(parseInt(e.target.value))}
+                            min="40"
+                            max="208"
+                            className="tempo-input"
+                        />
+                    </div>
+                    <div className="setting-group">
+                        <label>Time Signature:</label>
+                        <select
+                            value={`${timeSignature.numerator}/${timeSignature.denominator}`}
+                            onChange={(e) => {
+                                const [num, den] = e.target.value.split('/');
+                                handleTimeSignatureChange({
+                                    numerator: parseInt(num),
+                                    denominator: parseInt(den)
+                                });
+                            }}
+                            className="time-signature-select"
+                        >
+                            {TIME_SIGNATURES.map((sig) => (
+                                <option key={sig.display} value={sig.display}>
+                                    {sig.display}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="setting-group">
+                        <label>Key:</label>
+                        <select
+                            value={selectedKey}
+                            onChange={(e) => setSelectedKey(e.target.value)}
+                            className="key-signature-select"
+                        >
+                            {KEY_SIGNATURES.map((sig) => (
+                                <option key={sig.key} value={sig.key}>
+                                    {sig.display}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <button onClick={downloadAbc} className="download-button">
+                        Download ABC
+                    </button>
+                </div>
+            )}
+            <div ref={scoreRef} className="score-container"></div>
         </div>
     );
 };
 
-export default MidiScoreViewer;
+export default ScoreViewer;
