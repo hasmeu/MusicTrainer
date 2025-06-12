@@ -67,9 +67,9 @@ K:${selectedKey}
         const visualObj = ABCJS.renderAbc(scoreRef.current, fullNotation, {
             responsive: 'resize',
             add_classes: true,
-            staffwidth: 2000,  // Increased from 1600
-            scale: 2.0,        // Increased from 1.5
-            paddingbottom: 40, // Increased padding for better visual balance
+            staffwidth: 2000,
+            scale: 2.0,
+            paddingbottom: 40,
             paddingright: 40,
             paddingleft: 40,
             paddingtop: 40,
@@ -136,7 +136,6 @@ K:${selectedKey}
         }
     };
 
-    // ... (keep existing handleTimeSignatureChange and downloadAbc functions)
     const handleTimeSignatureChange = (sig) => {
         setTimeSignature({
             numerator: sig.numerator,

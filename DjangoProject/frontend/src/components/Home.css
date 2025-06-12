@@ -1,4 +1,3 @@
-/* Reset and base styles */
 * {
     margin: 0;
     padding: 0;
@@ -25,7 +24,6 @@ body {
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Navigation styles */
 .navbar {
     background: linear-gradient(135deg, #2c3e50, #34495e);
     padding: 1rem 2rem;
@@ -88,7 +86,6 @@ body {
     box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
 }
 
-/* Hero section */
 .hero-section {
     padding: 4rem 2rem;
     text-align: center;
@@ -127,7 +124,6 @@ body {
     }
 }
 
-/* Score section */
 .score-section {
     padding: 3rem 2rem;
     background: white;
@@ -158,7 +154,6 @@ body {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Action section */
 .action-section {
     padding: 3rem 2rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -236,7 +231,6 @@ body {
     font-size: 1.2rem;
 }
 
-/* MIDI upload styles */
 .midi-upload {
     margin: 2rem 0;
     padding: 2rem;
@@ -259,7 +253,6 @@ body {
     background: white;
 }
 
-/* Footer */
 .footer {
     background: #2c3e50;
     color: white;
@@ -268,7 +261,6 @@ body {
     margin-top: auto;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;
@@ -307,7 +299,6 @@ body {
         font-size: 2rem;
     }
 }
-/* Add these new styles to your existing Home.css */
 
 .score-actions {
     display: flex;

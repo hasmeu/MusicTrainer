@@ -113,7 +113,6 @@
   background-color: #cccccc;
   cursor: not-allowed;
 }
-/* Add these new styles to your existing CSS file */
 .controls {
   display: flex;
   gap: 8px;
