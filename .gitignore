@@ -1,30 +1,54 @@
-# Python virtual environment
-.venv/
-venv/
-ENV/
-
-# Python bytecode
+# Python/Django
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Django specific
-*.log
-local_settings.py
+*.so
+.Python
+*.sqlite3
 db.sqlite3
-db.sqlite3-journal
 media/
-
-# IDE specific (PyCharm)
-.idea/
-*.iws
-*.iml
-*.ipr
-
-# Environment variables
 .env
+.venv
+env/
+venv/
+ENV/
+*.log
+
+# Django stuff
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3-journal
+staticfiles/
+
+# React/Node.js
+node_modules/
+/build
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.next/
+dist/
+build/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
 
 # Misc
-*.swp
-.DS_Store
-/DjangoProject/App/__pycache__
+*.bak
