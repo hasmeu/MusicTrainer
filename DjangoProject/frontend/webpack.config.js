@@ -4,7 +4,8 @@ module.exports = {
     entry: path.resolve(__dirname, 'src/index.js'),
     output: {
         filename: 'main.js',
-        path: path.resolve(__dirname, '../staticfiles/static'),
+        path: path.resolve(__dirname, 'build'),
+        clean: true, // Clean the output directory before emit
     },
     module: {
         rules: [

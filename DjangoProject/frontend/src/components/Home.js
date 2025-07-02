@@ -4,7 +4,7 @@ import ScoreViewer from './MidiScoreViewer';
 import { Wand2 } from 'lucide-react';
 
 function Home() {
-    const [abcNotation, setAbcNotation] = useState("C2 C2 | G2 G2 | A2 A2 | G4 |");
+    const [abcNotation, setAbcNotation] = useState("C2 C2 | G2 G2 | A2 A2 | G4 | G2 G2 | A2 A2 | G4 | G2 G2 | A2 A2 | G4 |");
     const [isGenerating, setIsGenerating] = useState(false);
 
     const handleGenerate = async () => {
@@ -32,7 +32,7 @@ function Home() {
                 </div>
                 <div className="nav-links">
                     <a href="#home" className="nav-link active">Home</a>
-                    <a href="#practice" className="nav-link">Practice</a>
+                    <a href="#practice" className="nav-link">Ear Training</a>
                     <a href="#stats" className="nav-link">Statistics</a>
                     <a href="#profile" className="nav-link">Profile</a>
                 </div>

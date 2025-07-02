@@ -67,12 +67,17 @@ K:${selectedKey}
         const visualObj = ABCJS.renderAbc(scoreRef.current, fullNotation, {
             responsive: 'resize',
             add_classes: true,
-            staffwidth: 2000,
-            scale: 2.0,
+            staffwidth: 600, // Set a specific width to force wrapping
+            scale: 0.1,
             paddingbottom: 40,
             paddingright: 40,
             paddingleft: 40,
             paddingtop: 40,
+            wrap: {
+                minSpacing: 1.8,
+                maxSpacing: 2.7,
+                preferredMeasuresPerLine: 16 // Adjust this to control measures per line
+            },
             format: {
                 measurenumber: true,
                 vocalfont: "Arial 12",
@@ -87,7 +92,7 @@ K:${selectedKey}
             }
         });
 
-        // Initialize synthesizer if it hasn't been yet
+
         if (!synthRef.current) {
             synthRef.current = new ABCJS.synth.CreateSynth();
         }
