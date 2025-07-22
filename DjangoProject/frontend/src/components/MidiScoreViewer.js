@@ -63,11 +63,11 @@ K:${selectedKey}
 
         const fullNotation = headerString + (abcNotation || 'z4 |]');
 
-        // Create the visual score
+        // Create visual score
         const visualObj = ABCJS.renderAbc(scoreRef.current, fullNotation, {
             responsive: 'resize',
             add_classes: true,
-            staffwidth: 600, // Set a specific width to force wrapping
+            staffwidth: 600, // set a specific width to force wrapping
             scale: 0.1,
             paddingbottom: 40,
             paddingright: 40,
@@ -76,7 +76,7 @@ K:${selectedKey}
             wrap: {
                 minSpacing: 1.8,
                 maxSpacing: 2.7,
-                preferredMeasuresPerLine: 16 // Adjust this to control measures per line
+                preferredMeasuresPerLine: 16
             },
             format: {
                 measurenumber: true,

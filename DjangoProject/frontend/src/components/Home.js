@@ -11,9 +11,8 @@ function Home() {
         setIsGenerating(true);
         try {
             // TODO: Add AI generation logic here
-            // For now, just simulate a delay
             await new Promise(resolve => setTimeout(resolve, 1000));
-            // Placeholder: Later this will be replaced with actual AI-generated ABC notation
+            //  Later this will be replaced with actual AI-generated ABC notation
             setAbcNotation("E2 E2 | F2 F2 | G2 G2 | C4 |");
         } catch (error) {
             console.error('Error generating etude:', error);
